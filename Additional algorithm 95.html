@@ -1,0 +1,200 @@
+<!-- ############################################################################################################################## -->
+<!-- #  John Wiley & Sons, Inc.                                                                                                   # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Book:   Algorithms in Bioinformatics: Theory and Implementation                                                           # -->
+<!-- #  Author: Dr. Paul A. Gagniuc                                                                                               # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Institution:                                                                                                              # -->
+<!-- #    University Politehnica of Bucharest                                                                                     # -->
+<!-- #    Faculty of Engineering in Foreign Languages                                                                             # -->
+<!-- #    Department of Engineering in Foreign Languages                                                                          # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Area:   European Union                                                                                                    # -->
+<!-- #  Date:   04/01/2021                                                                                                        # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Cite this work as:                                                                                                        # -->
+<!-- #    Paul A. Gagniuc. Algorithms in Bioinformatics: Theory and Implementation. John Wiley & Sons, 2021, ISBN: 9781119697961. # -->
+<!-- #                                                                                                                            # -->
+<!-- ############################################################################################################################## -->
+
+<canvas id="bio" width="900" height="200"></canvas>
+<canvas id="letter" width="370" height="410" style="display: none;">
+</canvas>
+<div id="print"></div><br>
+
+<script>
+window.onload = function() {
+
+	//MAKE LOGO FROM MATRICES
+	c = '|G\t0.1\t0.2\t0.5\t1\t0\t0.5\t0.1\t0.8\t0.1' +
+		'|A\t0.3\t0.4\t0.2\t0\t0\t0.5\t0.7\t0.1\t0' +
+		'|T\t0.2\t0.3\t0.2\t0\t1\t0\t0\t0.1\t0.7' +
+		'|C\t0.4\t0.1\t0.1\t0\t0\t0\t0.2\t0\t0.2';
+	
+	
+	var msg;
+
+	var M = load(c);
+	var max = 0;
+	var min = 0;
+
+	msg = 'Unordered:<br>' + SMC(M)+'<br>';
+
+	var a = [];
+	var t = M[0].length;
+
+	//FIND THE MAXIMUM SUM OVER COLUMNS
+	var fmax=0;
+	var fmin=0;
+	for(var j=1; j<t; j++){
+		for(var k=0; k<M.length; k++){
+			fmax += Number(M[k][j].split('|')[0]);
+			fmin += Number(M[k][j].split('|')[0]);
+		}
+		if(max<=fmax){max=fmax;}
+		if(min>=fmin){min=fmin;}
+		fmax=0;
+		fmin=0;
+	}
+
+    var canvas = document.getElementById('bio');
+	var canvasl = document.getElementById('letter');
+	var ctl = canvasl.getContext('2d');
+	
+    var w = canvas.width;
+    var h = canvas.height-(max-min)-10;
+	
+    var wl = canvasl.width;
+    var hl = canvasl.height;
+    
+    if (canvas.getContext) {
+
+		var ctx = canvas.getContext('2d');
+
+		for(var j=1; j<t; j++){
+		
+			//ORDER VALUES ON EACH COLUMN
+			for(var k=0; k<M.length; k++){
+				a[k]=[];
+				a[k][0] = M[k][j].split('|')[0];
+				a[k][1] = M[k][j].split('|')[1];
+			}
+
+			a = iSort(a);
+			
+			for(var k=0; k<M.length; k++){
+				M[k][j] = a[k][0] + '|' + a[k][1];
+			}
+
+			// LOGO
+			var iw = w/(t-1);
+			var x =(j-1)*iw;
+			
+			var pune = 0;
+			
+			for (var u=0; u<a.length; u++)
+			{
+				ctl.imageSmoothingQuality = 'high';
+				ctl.clearRect(0, 0, wl, hl);
+				ctl.font = 'bold 540px Arial';
+				
+				var cl = 'black';
+				if(a[u][1]=='G'){cl='#fcaf07';}
+				if(a[u][1]=='T'){cl='#d50000';}
+				if(a[u][1]=='A'){cl='#07d607';}
+				if(a[u][1]=='C'){cl='#0909c8';}
+				
+				ctl.fillStyle = cl;
+				
+				var ltr = ctl.measureText(a[u][1]).width;
+				ctl.fillText(a[u][1], (wl/2)-(ltr/2), hl-5);
+				
+				var y = h-(h/max)*(Number(a[u][0])+pune);
+				
+				if(u>0){var ih = h-((h/max)*(pune))-y;}
+				if(u==0){var ih = h-y;}
+				
+				pune += Number(a[u][0]);
+				
+				ih = ih;
+
+				ctx.imageSmoothingQuality = 'high';
+				ctx.drawImage(canvasl, x, y, iw, ih);
+			}
+		}
+	}
+	
+	msg += 'Ordered by columns:<br>' + SMC(M);
+	document.getElementById('print').innerHTML = msg;
+}
+
+
+//SORT
+function iSort(a) {
+    var n = a.length;
+	for (var i = 1; i < n; i++) {
+		let n = a[i][0];
+		let j = i-1;
+		
+		while ((j > -1) && (n < a[j][0])) {
+		
+			a[j+1][0] = a[j][0];
+			
+			var t = a[j+1][1];
+			a[j+1][1] = a[j][1];
+			a[j][1]=t;
+			j--;
+		}
+		a[j+1][0] = n;
+	}
+    return a;
+}
+
+//LOAD MATRICES FROM STRINGS
+function load(t){
+    var n = [];
+    var m = [];
+    var L = [];
+
+    m = t.split('|');
+    var maxc = 0;
+	var max = 0;
+
+
+    for(var i=1; i<m.length; i++) {
+        L[i-1]=[];
+        n = m[i].split('\t');
+        for(var j=0; j<n.length; j++){
+            L[i-1][j]=n[j];
+			if(j>0){
+				//if(L[i-1][j]>0){L[i-1][j]=n[j]*Log(2,(1/n[j]));}
+				if(L[i-1][j]>0){L[i-1][j]=-Log(2,(n[j])).toFixed(2);}
+				L[i-1][j]+='|'+L[i-1][0];
+			}
+        }
+    }
+    return L;
+}
+
+// SHOW MATRIX CONTENT 
+function SMC(m) {
+    var r = "<table border=1>";
+    for(var i=0; i<m.length; i++) {
+        r += "<tr>";
+        for(var j=0; j<m[i].length; j++){
+            r += "<td>"+m[i][j]+"</td>";
+        }
+        r += "</tr>";
+    }
+    r += "</table>";
+
+    return r;
+}
+
+function Log(n, v) {
+  return Math.log(v) / Math.log(n);
+}
+
+
+</script>
+

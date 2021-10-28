@@ -1,0 +1,180 @@
+<!-- ############################################################################################################################## -->
+<!-- #  John Wiley & Sons, Inc.                                                                                                   # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Book:   Algorithms in Bioinformatics: Theory and Implementation                                                           # -->
+<!-- #  Author: Dr. Paul A. Gagniuc                                                                                               # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Institution:                                                                                                              # -->
+<!-- #    University Politehnica of Bucharest                                                                                     # -->
+<!-- #    Faculty of Engineering in Foreign Languages                                                                             # -->
+<!-- #    Department of Engineering in Foreign Languages                                                                          # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Area:   European Union                                                                                                    # -->
+<!-- #  Date:   04/01/2021                                                                                                        # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Cite this work as:                                                                                                        # -->
+<!-- #    Paul A. Gagniuc. Algorithms in Bioinformatics: Theory and Implementation. John Wiley & Sons, 2021, ISBN: 9781119697961. # -->
+<!-- #                                                                                                                            # -->
+<!-- ############################################################################################################################## -->
+
+<style>
+    body {
+        padding: 1rem;
+        font-family: monospace;
+        font-size: 18px; 
+        font-style: normal; 
+        font-variant: normal;
+        line-height: 20px;
+    }
+</style>
+
+<script>
+
+// Variable statement
+var Match = +2;
+var Mismatch = -1;
+var gap = -2;
+
+var s0 = 'AGCCCTCCAGGACAGGCTGCATCAGAAGAGGCCATCAAGCAGGTCTGTT';
+var s1 = 'GAAATGATCCGGAAATTGCAGCCTCAGCCCCCAGCCATCTGCTAACCCC';
+    
+var AlignmentA = "";
+var AlignmentM = "";
+var AlignmentB = "";
+
+var e = '&emsp;';
+
+var m = [];
+var s = [];
+
+var MMax = 0;
+var MMin = 0;
+
+var x = 0;
+var y = 0;
+
+// Matrix initialization and completion
+s[0] = [] = s0.split(''); 
+s[1] = [] = s1.split('');
+
+var n_0 = s[0].length + 1;
+var n_1 = s[1].length + 1;
+
+for(var i=0; i<=n_0; i++) {
+
+    m[i]=[];
+
+    for(var j=0; j<=n_1; j++) {
+
+        m[i][j]=0;
+
+        if (i==1 && j>1) {m[i][j]=m[i][j-1]+gap;}
+        if (j==1 && i>1) {m[i][j]=m[i-1][j]+gap;}
+
+        if (i>1) {m[i][0]=s[0][i-2];}
+        if (j>1) {m[0][j]=s[1][j-2];}
+
+        if(i>1 && j>1){
+            var A = m[i-1][j-1] + f(m[i][0],m[0][j]);   //'\
+            var B = m[i-1][j] + gap;                    //'-
+            var C = m[i][j-1] + gap;                    //'|
+            var D = 0;
+        
+            m[i][j] = Math.max(A, B, C, D);
+
+            if(m[i][j] > MMax){MMax = m[i][j];x=i;y=j;}
+            if(m[i][j] < MMin){MMin = m[i][j];}
+        }
+    }
+}
+
+//Traceback & text alignment
+var i = x;
+var j = y;
+
+while (i>=2 || j>=2) {
+
+    var Ai = m[i][0];
+    var Bj = m[0][j];
+    
+    A = m[i-1][j-1] + f(Ai, Bj);
+    B = m[i-1][j] + gap;
+    C = m[i][j-1] + gap;
+
+    if(i>=2 && j>=2 && m[i][j]==A) {
+
+        AlignmentA = Ai + AlignmentA;
+        AlignmentB = Bj + AlignmentB;
+        
+        if(Ai==Bj){
+            AlignmentM = '|' + AlignmentM;
+        } else {
+            AlignmentM = e + AlignmentM;
+        }
+        
+        i = i - 1;
+        j = j - 1;
+
+    } else {
+        
+        if(i>=2 && m[i][j]==B) {
+            AlignmentA = Ai + AlignmentA;
+            AlignmentB = '-' + AlignmentB;
+            AlignmentM = e + AlignmentM;
+            i = i - 1;
+
+        } else {
+            AlignmentA = '-' + AlignmentA;
+            AlignmentB = Bj + AlignmentB;
+            AlignmentM = e + AlignmentM;
+            j = j - 1;
+        }
+    }
+    
+    var r1 = i - 1;
+    var r2 = j - 1;
+
+    if(m[i][j]<=0){break;}  
+}
+
+// LAYOUT
+var tM='';
+var tS='';
+
+// Check the end
+AlignmentA = AlignmentA + s0.substr(x-1, n_0 - x);
+AlignmentB = AlignmentB + s1.substr(y-1, n_1 - y);
+
+// Check the beginning
+AlignmentA = s0.substr(0, r1) + AlignmentA;
+AlignmentB = s1.substr(0, r2) + AlignmentB;
+
+if(r1>r2){
+    var v = r1 - r2;
+    
+    for(var u=1; u<=v; u++) {tS = tS + e;}
+    for(var u=1; u<=v+r2; u++) {tM = tM + e;}
+    
+    AlignmentB = tS + AlignmentB;
+    AlignmentM = tM + AlignmentM;
+} else {
+    var v = r2 - r1;
+    
+    for(var u=1; u<=v; u++) {tS = tS + e;}
+    for(var u=1; u<=v+r1; u++) {tM = tM + e;}
+    
+    AlignmentA = tS + AlignmentA;
+    AlignmentM = tM + AlignmentM;
+}
+
+// Print the alignment
+document.write(AlignmentA + '<br>');
+document.write(AlignmentM + '<br>');
+document.write(AlignmentB + '<br>');
+
+// Matching function
+function f(a1, a2) {
+    if(a1 === a2){return Match;} else {return Mismatch;}
+}
+
+</script>

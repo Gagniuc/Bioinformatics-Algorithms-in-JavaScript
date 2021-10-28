@@ -1,0 +1,89 @@
+<!-- ############################################################################################################################## -->
+<!-- #  John Wiley & Sons, Inc.                                                                                                   # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Book:   Algorithms in Bioinformatics: Theory and Implementation                                                           # -->
+<!-- #  Author: Dr. Paul A. Gagniuc                                                                                               # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Institution:                                                                                                              # -->
+<!-- #    University Politehnica of Bucharest                                                                                     # -->
+<!-- #    Faculty of Engineering in Foreign Languages                                                                             # -->
+<!-- #    Department of Engineering in Foreign Languages                                                                          # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Area:   European Union                                                                                                    # -->
+<!-- #  Date:   04/01/2021                                                                                                        # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Cite this work as:                                                                                                        # -->
+<!-- #    Paul A. Gagniuc. Algorithms in Bioinformatics: Theory and Implementation. John Wiley & Sons, 2021, ISBN: 9781119697961. # -->
+<!-- #                                                                                                                            # -->
+<!-- ############################################################################################################################## -->
+
+<script>
+
+// A SCANNER THAT USES THRESHOLDS AND A KNOWN PWM 
+
+c = "|G\t-0.92\t-0.22\t0.69\t1.39\t-40.06\t0.69\t-0.92\t1.16\t-0.92" +
+    "|A\t0.18\t0.47\t-0.22\t-40.06\t-40.06\t0.69\t1.03\t-0.92\t-40.06" +
+    "|T\t-0.22\t0.18\t-0.22\t-40.06\t1.39\t-40.06\t-40.06\t-0.92\t1.03" +
+    "|C\t0.47\t-0.92\t-0.92\t-40.06\t-40.06\t-40.06\t-0.22\t-40.06\t-0.22"
+
+var n = [];
+var m = [];
+var p = [];
+
+m = c.split('|');
+
+// LOAD PWM
+for(var i=1; i<m.length; i++) {
+    p[i-1]=[];
+    n = m[i].split('\t');
+    for(var j=0; j<n.length; j++){
+        p[i-1][j]=n[j]
+    }
+}
+
+// SEARCH MOTIF IN Z
+var z = "AAAATCAGTGAATAAAAACAGGTGAGTAAAAATAAGTGAATAAAA";
+
+var r = '';
+var w = '';
+var u = z.length - n.length + 2;
+
+for(var l=0; l<u; l++) {
+
+    w = z.substr(l, n.length-1);
+    var d = w.split('');
+
+    var score = 0;
+    for(var f=0; f<d.length; f++){
+        for(var h=1; h<m.length; h++){
+            if(d[f]==p[h-1][0]) {score += Number(p[h-1][f+1]);}
+        }
+    }
+
+    if(score<0){score=0;}
+    r += score.toFixed(0) + ',';
+}
+
+document.write('Signal by score values:<br>' + r + '<hr>');
+document.write('Signal by percent:<br>');
+
+var v = r.split(',');
+var rez = '';
+var th = 40;
+var max=0;
+
+// FIND MAX
+for(var i=0; i<v.length; i++) {
+    if(v[i]>max){max=v[i];}
+}
+//max = Math.max(v);
+
+for(var i=0; i<v.length; i++) {
+    var pro = (100/max)*v[i];
+    document.write(pro + ',');
+    if(pro>th){rez += v[i];} else {rez += '-';}
+}
+
+document.write('<hr>Signal by threshold [' + th + '%]<br>' + rez);
+
+</script>

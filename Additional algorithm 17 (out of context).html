@@ -1,0 +1,55 @@
+<!-- ############################################################################################################################## -->
+<!-- #  John Wiley & Sons, Inc.                                                                                                   # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Book:   Algorithms in Bioinformatics: Theory and Implementation                                                           # -->
+<!-- #  Author: Dr. Paul A. Gagniuc                                                                                               # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Institution:                                                                                                              # -->
+<!-- #    University Politehnica of Bucharest                                                                                     # -->
+<!-- #    Faculty of Engineering in Foreign Languages                                                                             # -->
+<!-- #    Department of Engineering in Foreign Languages                                                                          # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Area:   European Union                                                                                                    # -->
+<!-- #  Date:   04/01/2021                                                                                                        # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Cite this work as:                                                                                                        # -->
+<!-- #    Paul A. Gagniuc. Algorithms in Bioinformatics: Theory and Implementation. John Wiley & Sons, 2021, ISBN: 9781119697961. # -->
+<!-- #                                                                                                                            # -->
+<!-- ############################################################################################################################## -->
+
+<script>
+
+var r1 = i - 1;
+var r2 = j - 1;
+
+// Relative positioning of sequences
+var tM='';
+var tS='';
+
+// Add to the end
+AlignmentA = AlignmentA + s0.substr(x-1, n_0 - x);
+AlignmentB = AlignmentB + s1.substr(y-1, n_1 - y);
+
+// Add to the beginning
+AlignmentA = s0.substr(0, r1) + AlignmentA;
+AlignmentB = s1.substr(0, r2) + AlignmentB;
+
+if(r1>r2){
+    var v = r1 - r2;
+    
+    for(var u=1; u<=v; u++) {tS = tS + e;}
+    for(var u=1; u<=v+r2; u++) {tM = tM + e;}
+    
+    AlignmentB = tS + AlignmentB;
+    AlignmentM = tM + AlignmentM;
+} else {
+    var v = r2 - r1;
+    
+    for(var u=1; u<=v; u++) {tS = tS + e;}
+    for(var u=1; u<=v+r1; u++) {tM = tM + e;}
+    
+    AlignmentA = tS + AlignmentA;
+    AlignmentM = tM + AlignmentM;
+}
+
+</script>

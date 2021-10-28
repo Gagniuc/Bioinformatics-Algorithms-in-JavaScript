@@ -1,0 +1,119 @@
+<!-- ############################################################################################################################## -->
+<!-- #  John Wiley & Sons, Inc.                                                                                                   # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Book:   Algorithms in Bioinformatics: Theory and Implementation                                                           # -->
+<!-- #  Author: Dr. Paul A. Gagniuc                                                                                               # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Institution:                                                                                                              # -->
+<!-- #    University Politehnica of Bucharest                                                                                     # -->
+<!-- #    Faculty of Engineering in Foreign Languages                                                                             # -->
+<!-- #    Department of Engineering in Foreign Languages                                                                          # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Area:   European Union                                                                                                    # -->
+<!-- #  Date:   04/01/2021                                                                                                        # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Cite this work as:                                                                                                        # -->
+<!-- #    Paul A. Gagniuc. Algorithms in Bioinformatics: Theory and Implementation. John Wiley & Sons, 2021, ISBN: 9781119697961. # -->
+<!-- #                                                                                                                            # -->
+<!-- ############################################################################################################################## -->
+
+<canvas id="bio" height="500" width="500"></canvas>
+
+<script>
+
+var z = 'GTAAAAATCTAGTTTTCCGTACTCTGTCCCCTTTTTAATCCTTCTCTGAATGGGTGTCC' +
+        'TTGATTCACTGACATTTCCTAATTAACCAAGTTCTGCCAAGTTTCACATGAAACTTGGG' +
+        'GAACCGATTTCATTCCCCCAGTATCACCCTGTGGCGCCACCTTCCGGAGCTGTGAGGAA' +
+        'ACTCCGGACTTCCCCCCAACACCGCCCCCTCCCTCCACCCTCGGTCTCCGCTTTCTGCG' +
+        'CTCTGCCGCGTTGGTTTTCGGAGGTGTCTGGGCGCATGCGCTTTGGACGGGCCGCCTAG' +
+        'CCTAGGAGAGACTACAATTCCCAGAAGACAGTGCGAAAGAAAAAAAAAATCCCGCGGTC' +
+        'CGTGGGGGTGGGAGAAATAAACGCTCGCGAGAGAACGAGGTTCAGGCGGCTGCACGAAG' +
+        'GGGGTGGAGGGGGGCTGGAGAGAGTGAGGAGGAAGGGGAGGAGGTGCCGTCCCACAATA' +
+        'CCAGGCGGGAGGGCGGGTAGGCGGTTTGTATCCGGGCTGTGAGGTGCTCGGAGCCTCGG' +
+        'CGGACCTTGCTGCCTCTGTCTCTTTAACGCGAGAGGAAGCGATGCAGAGGGGTGGAAAA' +
+        'TGGCAGAGCT';
+
+Pattern(z);
+
+function Pattern(s) {
+
+    var n = 30;
+    var sp = 1;
+    var sw;
+
+    var x;
+    var y;
+
+    var canvas = document.getElementById('bio');
+
+    var w = canvas.width;
+    var h = canvas.height;
+    
+    if (canvas.getContext) {
+
+        var ctx = canvas.getContext('2d');
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'black';
+
+        for (var u=0; u<=s.length - n; u += sp)
+        {
+            sw = s.substr(u,n);
+            
+            x = (w/100) * CG(sw);
+            y = (h/100) * IC(sw);
+            
+            ctx.fillRect(x, y, (w/sw.length)-2, 1);
+        }
+    }
+}
+
+// Information content
+function IC(s)
+{
+    var t = 0;
+    var m = 0;
+    var x = [];
+    
+    x = s.split('');
+
+    for (var u=1; u<=(s.length - 1); u++)
+    {
+        for (var i=0; i<=(s.length-u); i++)
+        {m += f(x[i], x[u+i]);} 
+
+        t += (m / (s.length-u) * 100);
+        m = 0;
+    }
+
+    return (100 - (t / (s.length - 1))).toFixed(2);
+}
+
+function f(x1, x2){
+    if (x1 == x2) {return 1;} else {return 0;}
+}
+
+// CG% content
+function CG(s)
+{
+    s = s.toLowerCase();
+
+    var a = 0;
+    var t = 0;
+    var c = 0;
+    var g = 0;
+
+    for (var u=0; u<=s.length; u ++)
+    {
+        var n = s.substr(u,1);
+
+        if (n == "a") {a = a + 1;}
+        if (n == "t") {t = t + 1;}
+        if (n == "g") {g = g + 1;}
+        if (n == "c") {c = c + 1;}
+    }
+
+    return ((100 / (c + g + t + a)) * (c + g)).toFixed(2);
+}
+
+</script>

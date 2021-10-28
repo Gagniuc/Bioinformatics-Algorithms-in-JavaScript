@@ -1,0 +1,148 @@
+<!-- ############################################################################################################################## -->
+<!-- #  John Wiley & Sons, Inc.                                                                                                   # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Book:   Algorithms in Bioinformatics: Theory and Implementation                                                           # -->
+<!-- #  Author: Dr. Paul A. Gagniuc                                                                                               # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Institution:                                                                                                              # -->
+<!-- #    University Politehnica of Bucharest                                                                                     # -->
+<!-- #    Faculty of Engineering in Foreign Languages                                                                             # -->
+<!-- #    Department of Engineering in Foreign Languages                                                                          # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Area:   European Union                                                                                                    # -->
+<!-- #  Date:   04/01/2021                                                                                                        # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Cite this work as:                                                                                                        # -->
+<!-- #    Paul A. Gagniuc. Algorithms in Bioinformatics: Theory and Implementation. John Wiley & Sons, 2021, ISBN: 9781119697961. # -->
+<!-- #                                                                                                                            # -->
+<!-- ############################################################################################################################## -->
+
+<canvas id="bio" height="300" width="1100"></canvas>
+
+<script>
+
+// SCANNER
+// THE INFORMATION ENTROPY
+// THE INFORMATION CONTENT
+
+var z = "AAAAAACAGGTGAGTAAAAAAAA";
+
+var signal_s = '';
+var signal_e = '';
+
+var wl = 12;
+var w = '';
+
+var u = z.length - wl + 1;
+
+for(var l=0; l<u; l++) {
+    w = z.substr(l, wl);
+    signal_s += content(w); 
+    signal_e += entropy(w);
+    
+    if(l<u-1){
+        signal_s += ',';
+        signal_e += ',';
+    }
+}
+
+document.write('<hr>Sequence: '+z+'<br>');
+document.write('Information CONTENT: '+signal_s+'<br>');
+document.write('Information ENTROPY: '+signal_e+'<br>');
+
+Chart(signal_s, '#ff0000', 'y')
+Chart(signal_e, '#000000', 'n')
+
+//INFORMATION CONTENT (SELF-SEQUENCE ALIGNMENT)
+
+function content(s)
+{
+    var t = 0;
+    var m = 0;
+    var x = [];
+    
+    x = s.split('');
+
+    for (var u=1; u<=(s.length - 1); u++)
+    {
+        for (var i=0; i<=(s.length-u); i++)
+        {m += f(x[i], x[u+i]);} 
+        t += (m / (s.length-u) * 100);
+        m = 0;
+    }
+
+    return (100 - (t / (s.length - 1))).toFixed(1);
+}
+
+function f(x1, x2){
+    if (x1 == x2) {return 1;} else {return 0;}
+}
+
+//INFORMATION ENTROPY
+function entropy(c){
+
+    //ALPHABET DETECTION
+    var a = [];
+    var t = c.split('');
+    var k = t.length;
+
+    for(var i=0; i<=k; i++){
+        var q = 1;
+        for(var j=0; j<=a.length; j++){
+            if (t[i] === a[j]) {q = 0;}
+        }
+        if (q === 1) {a.push(t[i]);}
+    }
+
+    var e = 0;
+    var r = '';
+
+    for(var i=0; i<=a.length-1; i++){
+        r = c.replace(new RegExp(a[i], 'g'),'').length;
+        a[i]=(k-r)/k;
+        //e += -(a[i]*Log(2,a[i]));
+        e += (a[i]*Log(2,(1/a[i])));
+    }
+
+    return e.toFixed(1);
+}
+
+
+function Log(n, v) {
+  return Math.log(v) / Math.log(n);
+}
+
+
+function Chart(q,c,e) {
+    
+    var s = q.split(",");
+    var mx = Math.max.apply(null, s);
+
+    var canvas = document.getElementById('bio');
+
+    var w = canvas.width;
+    var h = canvas.height;
+    
+    if (canvas.getContext) {
+
+        var ctx = canvas.getContext('2d');
+
+        if(e=='y'){ctx.clearRect(0, 0, w, h);}
+        
+        ctx.moveTo(0, 0);
+        ctx.beginPath();
+        
+        for (var i=0; i<=s.length-1; i++)
+        {
+            var y = h-((h / mx) * s[i]);
+            var x = (w / s.length) * i;
+            
+            ctx.lineTo(x, y+2);
+        }
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = c;
+        ctx.stroke();
+    }
+}
+
+</script>

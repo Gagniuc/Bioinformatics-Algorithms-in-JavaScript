@@ -1,0 +1,103 @@
+<!-- ############################################################################################################################## -->
+<!-- #  John Wiley & Sons, Inc.                                                                                                   # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Book:   Algorithms in Bioinformatics: Theory and Implementation                                                           # -->
+<!-- #  Author: Dr. Paul A. Gagniuc                                                                                               # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Institution:                                                                                                              # -->
+<!-- #    University Politehnica of Bucharest                                                                                     # -->
+<!-- #    Faculty of Engineering in Foreign Languages                                                                             # -->
+<!-- #    Department of Engineering in Foreign Languages                                                                          # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Area:   European Union                                                                                                    # -->
+<!-- #  Date:   04/01/2021                                                                                                        # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Cite this work as:                                                                                                        # -->
+<!-- #    Paul A. Gagniuc. Algorithms in Bioinformatics: Theory and Implementation. John Wiley & Sons, 2021, ISBN: 9781119697961. # -->
+<!-- #                                                                                                                            # -->
+<!-- ############################################################################################################################## -->
+
+<script>
+
+// AN IMPLEMENTATION BASED ON PSEUDO COUNTS
+
+var c = "GAAGTGAGT,TTCGTAAGT,AAGGTACTT,CTGGTGAGC,AGAGTGAGT," +
+        "CAGGTAGAG,ACTGTACGT,CTGGTGAGT,TATGTAAGT,CGGGTGAGC";
+
+var s = [];
+var m = [];
+
+m = c.split(',');
+var n = m.length;
+
+//THE ALIGNMENT MATRIX
+for(var i=0; i<n; i++){
+    s[i] = [];
+    s[i]=m[i].split('');
+}
+
+//ALPHABET DETECTION
+var a = [];
+var t = c.replace(/,/g, '').split('');
+var k = t.length;
+
+for(var i=0; i<=k; i++){
+    var q = 1;
+    for(var j=0; j<=a.length; j++){
+        if (t[i] === a[j]) {q = 0;}
+    }
+    if (q === 1) {a.push(t[i]);}
+}
+
+// PROFILE MATRIX INITIALIZATION
+var p = [];
+
+for(var h=0; h<a.length; h++){
+    p[h]=[];
+    for(var i=0; i<=s[0].length; i++) {
+        p[h][i]=0.00000000000000001;
+        p[h][0]=a[h];
+    }
+}
+
+// THE POSITION FREQUENCY MATRIX
+for(var i=0; i<s.length; i++) {
+    for(var j=0; j<s[i].length; j++){
+        for(var h=0; h<a.length; h++){
+            if (s[i][j] === a[h]) {p[h][j+1]++;}
+        }
+    }
+}
+
+// POSITION PROBABILITY MATRIX & LOG LIKELIHOOD MATRIX
+for(var i=0; i<p.length; i++) {
+    for(var j=0; j<p[i].length-1; j++){
+        var g = p[i][j+1]/s.length;
+        p[i][j+1]=Math.log(g/0.25).toFixed(2);
+    }
+}
+
+// SEARCH MOTIF IN Z
+var z = "AAAAAACAGGTGAGTAAAAAAAA";
+
+var r = '';
+var w = '';
+var u = z.length - s.length + 2;
+
+for(var l=0; l<u; l++) {
+
+    w = z.substr(l, s.length-1);
+    var d = w.split('');
+    
+    var score = 0;
+    for(var f=0; f<d.length; f++){
+        for(var h=0; h<a.length; h++){
+            if(d[f]==p[h][0]) {score += Number(p[h][f+1]);}
+        }   
+    }
+    r += score.toFixed(0) + ',';
+}
+
+document.write(r);
+
+</script>

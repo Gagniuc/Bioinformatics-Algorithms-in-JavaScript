@@ -1,0 +1,183 @@
+<!-- ############################################################################################################################## -->
+<!-- #  John Wiley & Sons, Inc.                                                                                                   # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Book:   Algorithms in Bioinformatics: Theory and Implementation                                                           # -->
+<!-- #  Author: Dr. Paul A. Gagniuc                                                                                               # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Institution:                                                                                                              # -->
+<!-- #    University Politehnica of Bucharest                                                                                     # -->
+<!-- #    Faculty of Engineering in Foreign Languages                                                                             # -->
+<!-- #    Department of Engineering in Foreign Languages                                                                          # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Area:   European Union                                                                                                    # -->
+<!-- #  Date:   04/01/2021                                                                                                        # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Cite this work as:                                                                                                        # -->
+<!-- #    Paul A. Gagniuc. Algorithms in Bioinformatics: Theory and Implementation. John Wiley & Sons, 2021, ISBN: 9781119697961. # -->
+<!-- #                                                                                                                            # -->
+<!-- ############################################################################################################################## -->
+
+<canvas id="bio" height="300" width="1100"></canvas>
+
+<script>
+
+//Spectral forecast model for signals
+var t = '';
+
+var tA = [];
+var tB = [];
+
+var A ='10.3,23.4,44.8,63.2,44.1,35.1,46.5';
+var B ='18.8,43.1,52.2,45.5,46.8,46.6,67.9';
+var P ='18.8,43.1,52.2,45.5,46.8,46.6,67.9';
+
+var tA = A.split(',');
+var tB = B.split(',');
+
+var maxA = Math.max.apply(null, tA);
+var maxB = Math.max.apply(null, tB);
+
+var tP = P.split(',');
+
+var max = Math.max(maxA, maxB)
+
+Chart(forecast(), '#000000', 'y');
+
+function forecast(){
+    var t = '';
+    for(var d=0; d<max; d++) {
+        var tmp = spectral(d);
+        t+=tmp;
+        if(d<max-1){t+=',';}
+    }
+    return t;
+}
+
+function spectral(d){
+    var M='';
+    for(var i=0; i<tA.length; i++) {
+        var tmp=((d/maxA)*tA[i])+(((max-d)/maxB)*tB[i]);
+        M+=tmp.toFixed(2);
+        if(i<tA.length-1){M+=','}
+    }
+    return index(M);
+}
+
+function index(M){
+    var u=0;
+    var k=0;
+    var h=0;
+    
+    var tM = M.split(',');
+
+    for(var i=0; i<tM.length; i++) {
+        u+=(Number(tP[i])*Number(tM[i]));   //(Pi*Mi)
+        k+=Number(tP[i])**2;                //(Pi^2)
+        h+=Number(tM[i])**2;                //(Mi^2)
+    }
+    //s[d] = (Pi*Mi)^2 / ((Pi^2) * (Mi^2))
+    return u**2/(k*h); 
+}
+
+
+// just a chart
+function Chart(q,c,e) {
+    
+    var s = q.split(",");
+    var mx = Math.max.apply(null, s);
+    var mn = Math.min.apply(null, s);
+
+    var canvas = document.getElementById('bio');
+
+    var w = canvas.width;
+    var h = canvas.height;
+    
+    if (canvas.getContext) {
+
+        var ctx = canvas.getContext('2d');
+
+        if(e=='y'){ctx.clearRect(0, 0, w, h);}
+        
+        ctx.moveTo(0, 0);
+        ctx.beginPath();
+        
+        for (var i=0; i<=s.length-1; i++)
+        {
+            var y = (h-80) - ((h-80) / (mx-mn)) * (s[i]-mn);
+            var x = ((w-80) / s.length) * i;
+            
+            ctx.lineTo(x+40, y+40);
+
+            ctx.font = "20px Arial";
+            
+            if(i==0){
+                ctx.textAlign = 'left';
+                ctx.fillText(Number(s[i]).toFixed(5), x+45, y+60);
+            }
+            
+            if(i==s.length-1){
+                ctx.textAlign = 'right';
+                ctx.fillText(Number(s[i]).toFixed(5), x+35, y+60);
+            }
+        }
+        
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = c;
+        ctx.stroke();
+
+        //left vertical line
+        ctx.moveTo(x+40, 0);
+        ctx.lineTo(x+40, h);
+        ctx.stroke();
+        
+        //right vertical line
+        ctx.moveTo(40, 0);
+        ctx.lineTo(40, h);
+        ctx.stroke();
+
+        //top line
+        ctx.moveTo(40, 1);
+        ctx.lineTo(x+40, 1);
+        ctx.stroke();
+        
+        //bottom line
+        ctx.moveTo(40, h-1);
+        ctx.lineTo(x+40, h-1);
+        ctx.stroke();
+        
+        //text
+        var text = 'Model B';
+        var dim = ctx.measureText(text).width;
+        ctx.save();
+        ctx.translate((40/2)+10,(h/2)+(dim/2)+14);
+        ctx.rotate(Math.PI + (Math.PI/2));
+        ctx.font = "30px Arial";
+        ctx.fillStyle = "#000000";
+        ctx.textAlign = "left";
+        ctx.fillText(text, 0, 0);
+        ctx.restore();
+
+        text = 'Model A';
+        dim = ctx.measureText(text).width
+        ctx.save();
+        ctx.translate(x+40+10,(h/2)-(dim/2)-14);
+        ctx.rotate(Math.PI / 2);
+        ctx.font = "30px Arial";
+        ctx.fillStyle = "#000000";
+        ctx.textAlign = "left";
+        ctx.fillText(text, 0, 0);
+        ctx.restore();
+    
+        text = 'Model P vs M';
+        dim = ctx.measureText(text).width;
+        ctx.save();
+        ctx.translate((w/2)-(dim/2)-30,h-10);
+        ctx.font = "30px Arial";
+        ctx.fillStyle = "#000000";
+        ctx.textAlign = "left";
+        ctx.fillText(text, 0, 0);
+        ctx.restore();
+    }
+}
+
+</script>

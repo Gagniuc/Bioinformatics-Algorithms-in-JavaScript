@@ -1,0 +1,165 @@
+<!-- ############################################################################################################################## -->
+<!-- #  John Wiley & Sons, Inc.                                                                                                   # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Book:   Algorithms in Bioinformatics: Theory and Implementation                                                           # -->
+<!-- #  Author: Dr. Paul A. Gagniuc                                                                                               # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Institution:                                                                                                              # -->
+<!-- #    University Politehnica of Bucharest                                                                                     # -->
+<!-- #    Faculty of Engineering in Foreign Languages                                                                             # -->
+<!-- #    Department of Engineering in Foreign Languages                                                                          # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Area:   European Union                                                                                                    # -->
+<!-- #  Date:   04/01/2021                                                                                                        # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Cite this work as:                                                                                                        # -->
+<!-- #    Paul A. Gagniuc. Algorithms in Bioinformatics: Theory and Implementation. John Wiley & Sons, 2021, ISBN: 9781119697961. # -->
+<!-- #                                                                                                                            # -->
+<!-- ############################################################################################################################## -->
+
+<script>
+
+// A SCANNER WITH TWO PFMs
+
+var c = "GAAGTGAGT,TTCGTAAGT,AAGGTACTT,CTGGTGAGC,AGAGTGAGT," +
+        "CAGGTAGAG,ACTGTACGT,CTGGTGAGT,TATGTAAGT,CGGGTGAGC";
+        
+var z = "AAAAAACAGGTGAGTAAAAAAAA";
+
+var sp = [];
+var mp = [];
+var sb = [];
+var mb = [];
+
+mp = c.split(',');
+var np = mp.length;
+
+var t = '';
+var o = z.length-mp[0].length;
+
+// MAKE BACKGROUND SET t
+for(var i=0; i<o; i++) {
+    t += z.substr(i, mp[0].length);
+    if(i<o-1){t += ','}
+}
+
+document.write('t="' + t + '"');
+
+mb = t.split(',');
+var nb = mb.length;
+
+// THE ALIGNMENT MATRIX FOR p
+for(var i=0; i<np; i++){
+    sp[i] = [];
+    sp[i] = mp[i].split('');
+}
+
+document.write('<hr>' + SMC(sp));
+
+// THE ALIGNMENT MATRIX FOR b
+for(var i=0; i<nb; i++){
+    sb[i] = [];
+    sb[i] = mb[i].split('');
+}
+
+document.write('<hr>' + SMC(sb));
+
+// ALPHABET DETECTION
+var a = [];
+var t = c.replace(/,/g, '').split('');
+var k = t.length;
+
+for(var i=0; i<=k; i++){
+    var q = 1;
+    for(var j=0; j<=a.length; j++){
+        if (t[i] === a[j]) {q = 0;}
+    }
+    if (q === 1) {a.push(t[i]);}
+}
+
+// SIMULTANEOUS MATRIX INITIALIZATION
+var p = [];
+var b = [];
+
+for(var h=0; h<a.length; h++){
+    p[h]=[];
+    b[h]=[];
+    for(var i=0; i<=sp[0].length; i++) {
+        p[h][i]=0.00000000000000001;
+        b[h][i]=0.00000000000000001;
+        p[h][0]=a[h];
+        b[h][0]=a[h];
+    }
+}
+
+// THE POSITION FREQUENCY MATRIX p
+for(var i=0; i<sp.length; i++) {
+    for(var j=0; j<sp[i].length; j++){
+        for(var h=0; h<a.length; h++){
+            if (sp[i][j] === a[h]) {p[h][j+1]++;}
+        }
+    }
+}
+
+document.write('<hr>' + SMC(p));
+
+// THE POSITION FREQUENCY MATRIX b
+for(var i=0; i<sb.length; i++) {
+    for(var j=0; j<sb[i].length; j++){
+        for(var h=0; h<a.length; h++){
+            if (sb[i][j] === a[h]) {b[h][j+1]++;}
+        }
+    }
+}
+
+document.write('<hr>' + SMC(b));
+
+// POSITION PROBABILITY MATRIX & POSITION WEIGHT MATRIX
+for(var i=0; i<p.length; i++) {
+    for(var j=0; j<p[i].length-1; j++){
+        var gp = p[i][j+1]/sp.length;
+        var gb = b[i][j+1]/sb.length;
+        p[i][j+1]=Math.log(gp/gb).toFixed(2);
+    }
+}
+
+document.write('<hr>' + SMC(p));
+
+// SCANNER - SEARCH MOTIF IN Z
+var r = '';
+var w = '';
+var u = z.length - sp[0].length + 1;
+
+for(var l=0; l<u; l++) {
+
+    w = z.substr(l, sp[0].length);
+    var d = w.split('');
+    
+    var score = 0;
+    for(var f=0; f<d.length; f++){
+        for(var h=0; h<a.length; h++){
+            if(d[f]==p[h][0]) {score += Number(p[h][f+1]);}
+        }   
+    }
+    
+    if(score<0){score=0;}
+    r += score.toFixed(0) + ',';
+}
+
+document.write('<hr>' + r);
+
+function SMC(m) {
+    var r = "<table border=1>";
+    for(var i=0; i<m.length; i++) {
+        r += "<tr>";
+        for(var j=0; j<m[i].length; j++){
+            r += "<td>"+m[i][j]+"</td>";
+        }
+        r += "</tr>";
+    }
+    r += "</table>";
+
+    return r;
+}
+
+</script>

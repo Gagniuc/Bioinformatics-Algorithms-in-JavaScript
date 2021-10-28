@@ -1,0 +1,81 @@
+<!-- ############################################################################################################################## -->
+<!-- #  John Wiley & Sons, Inc.                                                                                                   # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Book:   Algorithms in Bioinformatics: Theory and Implementation                                                           # -->
+<!-- #  Author: Dr. Paul A. Gagniuc                                                                                               # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Institution:                                                                                                              # -->
+<!-- #    University Politehnica of Bucharest                                                                                     # -->
+<!-- #    Faculty of Engineering in Foreign Languages                                                                             # -->
+<!-- #    Department of Engineering in Foreign Languages                                                                          # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Area:   European Union                                                                                                    # -->
+<!-- #  Date:   04/01/2021                                                                                                        # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Cite this work as:                                                                                                        # -->
+<!-- #    Paul A. Gagniuc. Algorithms in Bioinformatics: Theory and Implementation. John Wiley & Sons, 2021, ISBN: 9781119697961. # -->
+<!-- #                                                                                                                            # -->
+<!-- ############################################################################################################################## -->
+
+<script>
+
+//Spectral forecast model for signals
+var t = '';
+
+var tA = [];
+var tB = [];
+
+var A ='10.3,23.4,44.8,63.2,44.1,35.1,46.5';
+var B ='18.8,43.1,52.2,45.5,46.8,46.6,67.9';
+
+var P ='18.8,43.1,52.2,45.5,46.8,46.6,67.9';
+
+var tA = A.split(',');
+var tB = B.split(',');
+
+var maxA = Math.max.apply(null, tA);
+var maxB = Math.max.apply(null, tB);
+
+var tP = P.split(',');
+
+var max = Math.max(maxA, maxB)
+
+document.write(forecast()+'<hr>');
+
+function forecast(){
+    var t = '';
+    for(var d=0; d<max; d++) {
+        var tmp = spectral(d);
+        t+='For <i>d</i>='+d+', the index <i>s</i>['+d+'] = '+tmp;
+        if(d<max-1){t+='<br>';}
+    }
+    return t;
+}
+
+function spectral(d){
+    var M='';
+    for(var i=0; i<tA.length; i++) {
+        var tmp=((d/maxA)*tA[i])+(((max-d)/maxB)*tB[i]);
+        M+=tmp.toFixed(2);
+        if(i<tA.length-1){M+=','}
+    }
+    return index(M);
+}
+
+function index(M){
+    var u=0;
+    var k=0;
+    var h=0;
+    
+    var tM = M.split(',');
+
+    for(var i=0; i<tM.length; i++) {
+        u+=(Number(tP[i])*Number(tM[i]));   //(Pi*Mi)
+        k+=Number(tP[i])**2;                //(Pi^2)
+        h+=Number(tM[i])**2;                //(Mi^2)
+    }
+    //s[d] = (Pi*Mi)^2 / ((Pi^2) * (Mi^2))
+    return u**2/(k*h); 
+}
+
+</script>

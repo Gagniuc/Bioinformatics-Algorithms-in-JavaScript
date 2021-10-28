@@ -1,0 +1,147 @@
+<!-- ############################################################################################################################## -->
+<!-- #  John Wiley & Sons, Inc.                                                                                                   # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Book:   Algorithms in Bioinformatics: Theory and Implementation                                                           # -->
+<!-- #  Author: Dr. Paul A. Gagniuc                                                                                               # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Institution:                                                                                                              # -->
+<!-- #    University Politehnica of Bucharest                                                                                     # -->
+<!-- #    Faculty of Engineering in Foreign Languages                                                                             # -->
+<!-- #    Department of Engineering in Foreign Languages                                                                          # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Area:   European Union                                                                                                    # -->
+<!-- #  Date:   04/01/2021                                                                                                        # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Cite this work as:                                                                                                        # -->
+<!-- #    Paul A. Gagniuc. Algorithms in Bioinformatics: Theory and Implementation. John Wiley & Sons, 2021, ISBN: 9781119697961. # -->
+<!-- #                                                                                                                            # -->
+<!-- ############################################################################################################################## -->
+
+<script>
+
+var c = "GAAGTGAGT,TTCGTAAGT,AAGGTACTT,CTGGTGAGC,AGAGTGAGT," +
+        "CAGGTAGAG,ACTGTACGT,CTGGTGAGT,TATGTAAGT,CGGGTGAGC";
+
+var s = [];
+var m = [];
+
+m = c.split(',');
+var n = m.length;
+
+//THE ALIGNMENT MATRIX
+for(var i=0; i<n; i++){
+    s[i] = [];
+    s[i]=m[i].split('');
+}
+
+document.write('<hr>Alignment matrix: ' + SMC(s));
+
+//DETECT ALL LETTERS USING ARRAYS
+var a = [];
+
+var t = c.replace(/,/g, '').split('');
+var k = t.length;
+
+for(var i=0; i<=k; i++){
+    var q = 1;
+    for(var j=0; j<=a.length; j++){
+        if (t[i] === a[j]) {q = 0;}
+    }
+    if (q === 1) {a.push(t[i]);}
+}
+
+document.write('<hr>Alphabet: ' + SMC(a));
+
+// PROFILE MATRIX INITIALIZATION
+var p = [];
+
+for(var h=0; h<a.length; h++){
+
+    p[h]=[];
+
+    for(var i=0; i<=s[0].length; i++) {
+        p[h][i]=0;
+        p[h][0]=a[h];
+    }
+}
+
+document.write('<hr>Matrix p initialization: ' + SMC(p));
+
+// THE POSITION FREQUENCY MATRIX
+for(var i=0; i<s.length; i++) {
+
+    for(var j=0; j<s[i].length; j++){
+                
+        for(var h=0; h<a.length; h++){
+        
+            if (s[i][j] === a[h]) {p[h][j+1]++;}
+        }
+    }
+}
+
+document.write('<hr>Position frequency matrix: ' + SMC(p));
+
+// THE POSITION PROBABILITY MATRIX
+for(var i=0; i<p.length; i++) {
+    for(var j=0; j<p[i].length-1; j++){
+    
+        p[i][j+1]=p[i][j+1]/s.length;
+        
+    }
+}
+
+document.write('<hr>Position probability matrix: ' + SMC(p));
+
+// CONSENSUS SEQUENCE
+var e = [];
+
+e[0] = 0;
+e[1] = '';
+e[2] = '';
+
+for(var j=0; j<p[0].length-1; j++){
+
+    for(var i=0; i<p.length; i++) {
+    
+        if(p[i][j+1]>e[0]){
+            e[0]=p[i][j+1];
+            e[1]=p[i][0];
+        }
+    }
+    e[0]=0;
+    e[2] += e[1];
+}
+
+document.write('<hr>Consensus sequence: ' + e[2]);
+
+//THE POSITION WEIGHT MATRIX
+for(var i=0; i<p.length; i++) {
+
+    for(var j=0; j<p[i].length-1; j++){
+
+        p[i][j+1]=Math.log(p[i][j+1]/0.25).toFixed(2);
+    }
+}
+
+document.write('<hr>The Position Weight Matrix: ' + SMC(p));
+
+function Log(x, y) {
+  return Math.log(y) / Math.log(x);
+}
+
+// SHOW MATRIX CONTENT 
+function SMC(m) {
+    var r = "<table border=1>";
+    for(var i=0; i<m.length; i++) {
+        r += "<tr>";
+        for(var j=0; j<m[i].length; j++){
+            r += "<td>"+m[i][j]+"</td>";
+        }
+        r += "</tr>";
+    }
+    r += "</table>";
+
+    return r;
+}
+
+</script>

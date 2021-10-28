@@ -1,0 +1,246 @@
+<!-- ############################################################################################################################## -->
+<!-- #  John Wiley & Sons, Inc.                                                                                                   # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Book:   Algorithms in Bioinformatics: Theory and Implementation                                                           # -->
+<!-- #  Author: Dr. Paul A. Gagniuc                                                                                               # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Institution:                                                                                                              # -->
+<!-- #    University Politehnica of Bucharest                                                                                     # -->
+<!-- #    Faculty of Engineering in Foreign Languages                                                                             # -->
+<!-- #    Department of Engineering in Foreign Languages                                                                          # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Area:   European Union                                                                                                    # -->
+<!-- #  Date:   04/01/2021                                                                                                        # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Cite this work as:                                                                                                        # -->
+<!-- #    Paul A. Gagniuc. Algorithms in Bioinformatics: Theory and Implementation. John Wiley & Sons, 2021, ISBN: 9781119697961. # -->
+<!-- #                                                                                                                            # -->
+<!-- ############################################################################################################################## -->
+
+<canvas id="bio" width="900" height="200"></canvas>
+<canvas id="letter" width="370" height="410" style="display: none;">
+</canvas>
+<div id="print"></div><br>
+
+<script>
+
+//RPN4
+var c = 'GGGTGGCAAAC,' +
+		'CGGTGGCAAAG,' +
+		'GAGTGGCAAAA,' +
+		'CAGTGGCAAAT,' +
+		'GAGTAGCAAAC,' +
+		'CGGCGGCAAAA,' +
+		'AGGTGGCAAAA,' +
+		'AGGTGGCGAAA,' +
+		'TGGTGGCAAAA,' +
+		'CGGTGGCAAAA,' +
+		'TGGTGGCAAAT,' +
+		'AGGTGGCAAAA,' +
+		'GAGTGGCAATA,' +
+		'CGGTGGCAAAA,' +
+		'AGGTGGCTAGG,' +
+		'GGGTGGCAAAA,' +
+		'CGGTGGCGAAA,' +
+		'CGGTGGCAAAA,' +
+		'GGATGGCGACA,' +
+		'TGATGGCAAAA,' +
+		'AAGTGGCCTAC,' +
+		'TAGTGGAAAAT,' +
+		'TGGTGGCGAAA,' +
+		'AAGTGGCGTCT,' +
+		'GGGTGGCAAAC,' +
+		'GGGTGGCAAAA';
+
+var s = [];
+var m = [];
+
+m = c.split(',');
+var n = m.length;
+
+//THE ALIGNMENT MATRIX
+for(var i=0; i<n; i++){
+    s[i] = [];
+    s[i]=m[i].split('');
+}
+
+document.write('<hr>Alignment matrix: ' + SMC(s));
+
+//DETECT ALL LETTERS USING ARRAYS
+var a = [];
+
+var t = c.replace(/,/g, '').split('');
+var k = t.length;
+
+for(var i=0; i<=k; i++){
+    var q = 1;
+    for(var j=0; j<=a.length; j++){
+        if (t[i] === a[j]) {q = 0;}
+    }
+    if (q === 1) {a.push(t[i]);}
+}
+
+// PROFILE MATRIX INITIALIZATION
+var p = [];
+
+for(var h=0; h<a.length; h++){
+    p[h]=[];
+    for(var i=0; i<=s[0].length; i++) {
+        p[h][i]=0;
+        p[h][0]=a[h];
+    }
+}
+
+// THE POSITION FREQUENCY MATRIX
+for(var i=0; i<s.length; i++) {
+
+    for(var j=0; j<s[i].length; j++){
+                
+        for(var h=0; h<a.length; h++){
+        
+            if (s[i][j] === a[h]) {p[h][j+1]++;}
+        }
+    }
+}
+
+document.write('<hr>Position frequency matrix: ' + SMC(p));
+
+
+// THE POSITION PROBABILITY MATRIX
+var max = 0;
+for(var i=0; i<p.length; i++) {
+    for(var j=0; j<p[i].length-1; j++){
+    
+        p[i][j+1]=p[i][j+1]/s.length;
+		p[i][j+1]=p[i][j+1].toFixed(2);
+		
+		if(max<=p[i][j+1]){max=p[i][j+1];}
+		
+		p[i][j+1]+='|'+p[i][0] 
+    }
+}
+
+document.write('<hr>Position probability matrix: ' + SMC(p));
+
+logo(p,max);
+
+
+
+function logo(M, max) {
+
+	//MAKE LOGO FROM MATRICES
+	var msg;
+
+	msg = 'Unordered:<br>' + SMC(M)+'<br>';
+
+	var a = [];
+	var t = M[0].length;
+
+    var canvas = document.getElementById('bio');
+	var canvasl = document.getElementById('letter');
+	var ctl = canvasl.getContext('2d');
+	
+    var w = canvas.width;
+    var h = canvas.height - 5;
+	
+    var wl = canvasl.width;
+    var hl = canvasl.height;
+    
+    if (canvas.getContext) {
+
+		var ctx = canvas.getContext('2d');
+
+		for(var j=1; j<t; j++){
+		
+			//ORDER VALUES ON EACH COLUMN
+			for(var k=0; k<M.length; k++){
+				a[k]=[];
+				a[k][0] = M[k][j].split('|')[0];
+				a[k][1] = M[k][j].split('|')[1];
+			}
+
+			a = iSort(a);
+			
+			for(var k=0; k<M.length; k++){
+				M[k][j] = a[k][0] + '|' + a[k][1];
+			}
+
+			// LOGO
+			var iw = w/(t-1);
+			var x = (j-1)*iw;
+			
+			for (var u=0; u<a.length; u++)
+			{
+				ctl.imageSmoothingQuality = 'high';
+				ctl.clearRect(0, 0, wl, hl);
+				ctl.font = 'bold 540px Arial';
+				
+				var cl = 'black';
+				//if(a[u][1]=='G'){cl='#f4244c';}
+				//if(a[u][1]=='T'){cl='#607b46';}
+				//if(a[u][1]=='A'){cl='#f4244c';}
+				//if(a[u][1]=='C'){cl='#dcb655';}
+				
+				if(a[u][1]=='G'){cl='#fcaf07';}
+				if(a[u][1]=='T'){cl='#d50000';}
+				if(a[u][1]=='A'){cl='#07d607';}
+				if(a[u][1]=='C'){cl='#0909c8';}
+				
+				ctl.fillStyle = cl;
+				
+				var ltr = ctl.measureText(a[u][1]).width;
+				ctl.fillText(a[u][1], (wl/2)-(ltr/2), hl-5);
+				
+				var y = h-(h/max)*a[u][0];
+				
+				if(u>0){var ih = h-((h/max)*a[u-1][0])-y;}
+				if(u==0){var ih = h-y;}
+
+				ctx.imageSmoothingQuality = 'high';
+				ctx.drawImage(canvasl, x, y, iw, ih);
+			}
+		}
+	}
+	
+	msg += 'Ordered by columns:<br>' + SMC(M);
+	document.getElementById('print').innerHTML = msg;
+}
+
+//SORT
+function iSort(a) {
+    var n = a.length;
+	for (var i = 1; i < n; i++) {
+		let n = a[i][0];
+		let j = i-1;
+		
+		while ((j > -1) && (n < a[j][0])) {
+		
+			a[j+1][0] = a[j][0];
+			
+			var t = a[j+1][1];
+			a[j+1][1] = a[j][1];
+			a[j][1]=t;
+			j--;
+		}
+		a[j+1][0] = n;
+	}
+    return a;
+}
+
+// SHOW MATRIX CONTENT 
+function SMC(m) {
+    var r = "<table border=1>";
+    for(var i=0; i<m.length; i++) {
+        r += "<tr>";
+        for(var j=0; j<m[i].length; j++){
+            r += "<td>"+m[i][j]+"</td>";
+        }
+        r += "</tr>";
+    }
+    r += "</table>";
+
+    return r;
+}
+
+</script>
+

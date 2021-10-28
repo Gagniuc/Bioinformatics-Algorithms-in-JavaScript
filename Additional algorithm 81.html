@@ -1,0 +1,210 @@
+<!-- ############################################################################################################################## -->
+<!-- #  John Wiley & Sons, Inc.                                                                                                   # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Book:   Algorithms in Bioinformatics: Theory and Implementation                                                           # -->
+<!-- #  Author: Dr. Paul A. Gagniuc                                                                                               # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Institution:                                                                                                              # -->
+<!-- #    University Politehnica of Bucharest                                                                                     # -->
+<!-- #    Faculty of Engineering in Foreign Languages                                                                             # -->
+<!-- #    Department of Engineering in Foreign Languages                                                                          # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Area:   European Union                                                                                                    # -->
+<!-- #  Date:   04/01/2021                                                                                                        # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Cite this work as:                                                                                                        # -->
+<!-- #    Paul A. Gagniuc. Algorithms in Bioinformatics: Theory and Implementation. John Wiley & Sons, 2021, ISBN: 9781119697961. # -->
+<!-- #                                                                                                                            # -->
+<!-- ############################################################################################################################## -->
+
+<canvas id="bio" height="300" width="1100"></canvas>
+
+<script>
+
+//Spectral forecast model for matrices
+
+var tA ='|10\t33\t49' +
+        '|10\t12\t31' +
+        '|36\t43\t78';
+
+var tB ='|20\t75\t70' +
+        '|48\t84\t61' +
+        '|54\t62\t9';
+
+var tP ='|10\t33\t49' +
+        '|10\t12\t31' +
+        '|36\t43\t78';
+
+var tmp;
+
+tmp = load(tA);
+var A = tmp[0];
+var maxA = tmp[1];
+
+tmp = load(tB);
+var B = tmp[0];
+var maxB = tmp[1];
+
+tmp = load(tP);
+var P = tmp[0];
+
+var M = [];
+
+var max = Math.max(maxA, maxB)
+
+Chart(forecast(), '#000000', 'y');
+
+function forecast(){
+    var t = '';
+    for(var d=0; d<max; d++) {
+        var tmp = spectral(d);
+        t+=tmp;
+        if(d<max-1){t+=',';}
+    }
+    return t;
+}
+
+function spectral(d){
+    for(var i=0; i<A.length; i++) {
+        M[i]=[];
+        for(var j=0; j<A[i].length; j++){
+            M[i][j]=((d/maxA)*A[i][j])+(((max-d)/maxB)*B[i][j]);
+            M[i][j]=M[i][j].toFixed(2);
+        }
+    }
+    return index(M);
+}
+
+function index(M){
+    var u=0;
+    var k=0;
+    var h=0;
+
+    for(var i=0; i<M.length; i++) {
+        for(var j=0; j<M[i].length; j++){
+            u += (Number(P[i][j])*Number(M[i][j])); //(Pij*Mij)
+            k += Number(P[i][j])**2;                //(Pij^2)
+            h += Number(M[i][j])**2;                //(Mij^2)
+        }
+    }
+    //s[d] = (Pij*Mij)^2 / ((Pij^2) * (Mij^2))
+    return u**2/(k*h); 
+}
+
+//LOAD MATRICES FROM STRINGS
+function load(t){
+    var n = [];
+    var m = [];
+    var L = [];
+
+    m = t.split('|');
+    var max = 0;
+
+    for(var i=1; i<m.length; i++) {
+        L[i-1]=[];
+        n = m[i].split('\t');
+        for(var j=0; j<n.length; j++){
+            L[i-1][j]=Number(n[j]);
+            if(max<=L[i-1][j]){max=L[i-1][j];}
+        }
+    }
+    return [L, max];
+}
+
+// just a chart
+function Chart(q,c,e) {
+    
+    var s = q.split(",");
+    var mx = Math.max.apply(null, s);
+    var mn = Math.min.apply(null, s);
+
+    var canvas = document.getElementById('bio');
+
+    var w = canvas.width;
+    var h = canvas.height;
+    
+    if (canvas.getContext) {
+
+        var ctx = canvas.getContext('2d');
+
+        if(e=='y'){ctx.clearRect(0, 0, w, h);}
+        
+        ctx.moveTo(0, 0);
+        ctx.beginPath();
+        
+        for (var i=0; i<=s.length-1; i++)
+        {
+            var y = (h-80) - ((h-80) / (mx-mn)) * (s[i]-mn);
+            var x = ((w-80) / s.length) * i;
+            
+            ctx.lineTo(x+40, y+40);
+            ctx.font = "20px Arial";
+            
+            if(i==0){
+                ctx.textAlign = 'left';
+                ctx.fillText(Number(s[i]).toFixed(5), x+45, y+60);
+            }
+            
+            if(i==s.length-1){
+                ctx.textAlign = 'right';
+                ctx.fillText(Number(s[i]).toFixed(5), x+35, y+60);
+            }
+        }
+        
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = c;
+        ctx.stroke();
+
+        //left vertical line
+        ctx.moveTo(x+40, 0);
+        ctx.lineTo(x+40, h);
+        ctx.stroke();
+        
+        //right vertical line
+        ctx.moveTo(40, 0);
+        ctx.lineTo(40, h);
+        ctx.stroke();
+
+        //top line
+        ctx.moveTo(40, 1);
+        ctx.lineTo(x+40, 1);
+        ctx.stroke();
+        
+        //bottom line
+        ctx.moveTo(40, h-1);
+        ctx.lineTo(x+40, h-1);
+        ctx.stroke();
+        
+        //text
+        write(ctx, w, h, x, y, 'Model A', 'R');
+        write(ctx, w, h, x, y, 'Model B', 'L');
+        write(ctx, w, h, x, y, 'Model P vs M', 'B');
+    }
+}
+
+// write text on chart
+function write(ctx, w, h, x, y, text, l){
+
+    ctx.save();
+    var dim = ctx.measureText(text).width;
+
+    if(l=='B'){ctx.translate((w/2)-(dim/2)-30,h-10);}
+
+    if(l=='R'){
+        ctx.translate(x+40+10,(h/2)-(dim/2)-14);
+        ctx.rotate(Math.PI / 2);
+    }
+
+    if(l=='L'){
+        ctx.translate((40/2)+10,(h/2)+(dim/2)+14);
+        ctx.rotate(Math.PI + (Math.PI/2));
+    }
+
+    ctx.font = "30px Arial";
+    ctx.fillStyle = "#000000";
+    ctx.textAlign = "left";
+    ctx.fillText(text, 0, 0);
+    ctx.restore();
+}
+
+</script>

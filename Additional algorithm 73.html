@@ -1,0 +1,197 @@
+<!-- ############################################################################################################################## -->
+<!-- #  John Wiley & Sons, Inc.                                                                                                   # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Book:   Algorithms in Bioinformatics: Theory and Implementation                                                           # -->
+<!-- #  Author: Dr. Paul A. Gagniuc                                                                                               # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Institution:                                                                                                              # -->
+<!-- #    University Politehnica of Bucharest                                                                                     # -->
+<!-- #    Faculty of Engineering in Foreign Languages                                                                             # -->
+<!-- #    Department of Engineering in Foreign Languages                                                                          # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Area:   European Union                                                                                                    # -->
+<!-- #  Date:   04/01/2021                                                                                                        # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Cite this work as:                                                                                                        # -->
+<!-- #    Paul A. Gagniuc. Algorithms in Bioinformatics: Theory and Implementation. John Wiley & Sons, 2021, ISBN: 9781119697961. # -->
+<!-- #                                                                                                                            # -->
+<!-- ############################################################################################################################## -->
+
+<script>
+
+// MAIN SEQUENCE
+var z = 'GCTACGGCCGCGCATTCGATCGCGATTCGTTTG';
+
+// ORDER
+var h = 'ACGT';
+
+// TRAINING MODELS
+var s0 = h+'ATGCGCGCGGCATTCGTACGATGCGTACGGTCTA';
+var s1 = h+'ATTACTATATTATTTCGCGTAATACTGGTCTATATCGGCATT';
+
+var q;
+
+// GET THE TWO TRANSITION MATRICES
+var p = [] = DPD(s0, '(+)');
+var b = [] = DPD(s1, '(-)');
+
+document.write('Model (+):'+s0+'<br>'+SMC(p)+'<hr>');
+document.write('Model (-):'+s1+'<br>'+SMC(b)+'<hr>');
+
+p[0][0] = '(L)';
+for(var i=0; i<p.length; i++){
+    for(var j=0; j<p[i].length; j++){
+        if (i>0 && j>0) {
+        
+            if(p[i][j]==0){p[i][j]=0.000000000000000001;}
+            if(b[i][j]==0){b[i][j]=0.000000000000000001;}
+
+            q = p[i][j]/b[i][j];
+            p[i][j] = Log(2,q).toFixed(2);
+        }
+    }
+}
+
+document.write('log likelihood:<br>'+SMC(p)+'<hr>');
+
+// THE SCANNER
+var signal = '';
+var wl = 12;
+var w = '';
+
+var u = z.length - wl + 1;
+
+for(var r=0; r<u; r++) {
+    w = z.substr(r, wl);
+    signal += w + ' = ' + SW(w).toFixed(2) + '<br>';
+}
+
+document.write('z-sequence:<br>'+z+'<hr>');
+document.write('Signal:<br>'+signal+'<hr>');
+
+function SW(s){
+
+    var l = [];
+    var f=0;
+
+    l[0]="";
+    l[1]="";
+
+    for(var u=0; u<s.length; u++){
+
+        l[0] = s.substr(u, 1);
+        l[1] = s.substr(u + 1, 1);
+
+        for(var i=0; i<p.length; i++){
+            for(var j=0; j<p[i].length; j++){
+                if(p[i][0]==l[0] && p[0][j]==l[1]){
+                    f+=Number(p[i][j]);
+                }
+            }
+        }
+    }
+    return f;
+}
+
+function DPD(s, n){
+
+    //--------------[ Phase one ]--------------| 
+    var a = [];
+    var k = s.length;
+
+    for(var i=0; i<=k; i++){
+        var q = 1;
+        for(var j=0; j<=a.length; j++){
+            if (s[i] === a[j]) {q = 0;}
+        }
+        if (q === 1) {a.push(s[i]);}
+    }
+
+    //--------------[ Phase two ]--------------| 
+    var d = a.length-1;
+    var m = [];
+    var e = [];
+    var l = [];
+
+    for(var i=0; i<=d; i++){
+        m[i]=[];
+        e[i]=[];
+        for(var j=0; j<=d; j++){
+        
+            m[i][j]=0;
+
+            if (j === 0) {
+                e[i][0]=a[i];    
+                e[i][1]=0;
+            }
+        }
+    }
+
+    //-------------[ Phase three ]-------------| 
+    l[0]="";
+    l[1]="";
+
+    for(var i=0; i<s.length-1; i++){
+
+        l[0] = s.substr(i, 1);
+        l[1] = s.substr(i + 1, 1);
+
+        for(var j=0; j<=d; j++){
+            if (l[0] === e[j][0]) {
+                e[j][1] = e[j][1] + 1;
+                r = j;
+            }
+            if (l[1] === e[j][0]) {c=j;}
+        }
+        m[r][c] = m[r][c] + 1;
+    }
+
+    //-------------[ Phase four ]--------------| 
+
+    for(var i=0; i<=d; i++){
+        for(var j=0; j<=d; j++){
+            if (e[i][1] > 0) {
+                m[i][j]=(m[i][j]/e[i][1]).toFixed(2);
+            }
+        }
+    }
+
+    //----------------[ END ]------------------| 
+    var t = [];
+
+    for(var i=0; i<=d+1; i++){
+
+        t[i]=[];
+        
+        for(var j=0; j<=d+1; j++){
+        
+            if (j == 0 && i == 0) {t[i][j] = n;}
+            if (i>0 && j>0) {t[i][j] = m[i-1][j-1];}
+            if (i == 0 && j>0 && j<=d+1) {t[i][j]=a[j-1];}
+            if (j == 0 && i>0 && i<=d+1) {t[i][j]=a[i-1];}
+        }
+    }
+
+    return t;
+}
+
+function Log(n, v) {
+  return Math.log(v) / Math.log(n);
+}
+
+// SHOW MATRIX CONTENT 
+function SMC(m) {
+    var r = "<table border=1>";
+    for(var i=0; i<m.length; i++) {
+        r += "<tr>";
+        for(var j=0; j<m[i].length; j++){
+            r += "<td>"+m[i][j]+"</td>";
+        }
+        r += "</tr>";
+    }
+    r += "</table>";
+
+    return r;
+}
+
+</script>

@@ -1,0 +1,73 @@
+<!-- ############################################################################################################################## -->
+<!-- #  John Wiley & Sons, Inc.                                                                                                   # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Book:   Algorithms in Bioinformatics: Theory and Implementation                                                           # -->
+<!-- #  Author: Dr. Paul A. Gagniuc                                                                                               # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Institution:                                                                                                              # -->
+<!-- #    University Politehnica of Bucharest                                                                                     # -->
+<!-- #    Faculty of Engineering in Foreign Languages                                                                             # -->
+<!-- #    Department of Engineering in Foreign Languages                                                                          # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Area:   European Union                                                                                                    # -->
+<!-- #  Date:   04/01/2021                                                                                                        # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Cite this work as:                                                                                                        # -->
+<!-- #    Paul A. Gagniuc. Algorithms in Bioinformatics: Theory and Implementation. John Wiley & Sons, 2021, ISBN: 9781119697961. # -->
+<!-- #                                                                                                                            # -->
+<!-- ############################################################################################################################## -->
+
+<script>
+
+var s0 = 'TGAATTCAGTTA';
+var s1 = 'TGGATCGA';
+
+var Match = +2;
+var Mismatch = -1;
+var gap = -2;
+
+var m = [];
+var t = [];
+var s = [];
+
+s[0] = [] = s0.split(''); 
+s[1] = [] = s1.split('');
+
+var n_0 = s[0].length + 1;
+var n_1 = s[1].length + 1;
+
+for(var i=0; i<=n_0; i++) {
+
+    m[i]=[];
+    t[i]=[];
+
+    for(var j=0; j<=n_1; j++) {
+
+        m[i][j]=0;
+        t[i][j]=0;
+
+        if (i>1) {m[i][0]=s[0][i-2];}
+        if (j>1) {m[0][j]=s[1][j-2];}
+        
+        if (i==1 && j>1) {m[i][j]=m[i][j-1] + gap;}
+        if (j==1 && i>1) {m[i][j]=m[i-1][j] + gap;}
+    }
+}
+
+document.write(SMC(m));
+
+// SHOW MATRIX CONTENT
+function SMC(m) {
+    var r = "<table border=1>";
+    for(var i=0; i<m.length; i++) {
+        r += "<tr>";
+        for(var j=0; j<m[i].length; j++){
+            r += "<td>"+m[i][j]+"</td>";
+        }
+        r += "</tr>";
+    }
+    r += "</table>";
+
+    return r;
+}
+</script>

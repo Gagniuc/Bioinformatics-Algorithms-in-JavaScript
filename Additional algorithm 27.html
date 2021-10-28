@@ -1,0 +1,54 @@
+<!-- ############################################################################################################################## -->
+<!-- #  John Wiley & Sons, Inc.                                                                                                   # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Book:   Algorithms in Bioinformatics: Theory and Implementation                                                           # -->
+<!-- #  Author: Dr. Paul A. Gagniuc                                                                                               # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Institution:                                                                                                              # -->
+<!-- #    University Politehnica of Bucharest                                                                                     # -->
+<!-- #    Faculty of Engineering in Foreign Languages                                                                             # -->
+<!-- #    Department of Engineering in Foreign Languages                                                                          # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Area:   European Union                                                                                                    # -->
+<!-- #  Date:   04/01/2021                                                                                                        # -->
+<!-- #                                                                                                                            # -->
+<!-- #  Cite this work as:                                                                                                        # -->
+<!-- #    Paul A. Gagniuc. Algorithms in Bioinformatics: Theory and Implementation. John Wiley & Sons, 2021, ISBN: 9781119697961. # -->
+<!-- #                                                                                                                            # -->
+<!-- ############################################################################################################################## -->
+
+<script>
+
+// A frequency scanner
+var s = 'ATACCGGTCACGCGCGGCGCGCGCAC';
+
+var w = 9;
+var t = '';
+var n = '';
+
+for (var u=0; u<=s.length-w; u ++)
+{
+    n = s.substr(u,w);
+    x = GF(n,'CG');
+    //x = Number(GF(n,'C')) + Number(GF(n,'G'));
+    t += x + ',';
+    
+    document.write('['+n+']; CpG% = ' + x + '<br>');
+}
+
+document.write('Signal:<br>' + t);
+
+
+function GF(s, m)
+{
+    var p = 0;
+    s = s.toLowerCase();
+    m = m.toLowerCase();
+
+    p = s.split(m).join('').length;
+    p = (s.length - p)/s.length;
+
+    return (p * 100).toFixed(0);
+}
+
+</script>
