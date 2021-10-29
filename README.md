@@ -2,3 +2,4 @@
 Bioinformatics | Algorithms in JavaScript
 
 ![screenshot](https://github.com/Gagniuc/Bioinformatics-Algorithms-in-JavaScript/blob/main/bioinformatics.PNG)
+![screenshot](https://github.com/Gagniuc/Bioinformatics-Algorithms-in-JavaScript/blob/main/bio-jupiter%20on%20DNA.PNG)
